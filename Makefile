@@ -3,6 +3,16 @@ DOCDIR = /usr/share/doc/packages
 VERSION ?= $(shell (git describe 2>/dev/null || echo '0.0.0') | sed -e 's/^v//' -e 's/-/+/' -e 's/-/./')
 
 OS=$(shell source /etc/os-release ; echo $$ID)
+ifeq ($(OS), debian)
+USER=root
+GROUP=root
+PKG_INSTALL=apt-get install -y
+else
+ifeq ($(OS), ubuntu)
+USER=root
+GROUP=root
+PKG_INSTALL=apt-get install -y
+else
 ifeq ($(OS), opensuse)
 USER=salt
 GROUP=salt
@@ -17,6 +27,8 @@ USER=root
 GROUP=root
 ifeq ($(OS), centos)
 PKG_INSTALL=yum install -y
+endif
+endif
 endif
 endif
 endif
@@ -789,7 +801,17 @@ copy-files:
 	-chown $(USER):$(GROUP) $(DESTDIR)/srv/salt/ceph/configuration/files/ceph.conf.checksum || true
 
 install-deps:
+ifeq ($(OS), ubuntu)
+	$(PKG_INSTALL) python3-pip
+	pip3 install --upgrade pip salt
+else
+ifeq ($(OS), debian)
+	$(PKG_INSTALL) python3-pip
+	pip3 install --upgrade pip salt
+endif
+endif
 	$(PKG_INSTALL) python3-setuptools python3-click
+
 
 install: pyc install-deps copy-files
 	sed -i '/^sharedsecret: /s!{{ shared_secret }}!'`cat /proc/sys/kernel/random/uuid`'!' $(DESTDIR)/etc/salt/master.d/sharedsecret.conf
