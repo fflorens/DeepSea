@@ -803,11 +803,11 @@ copy-files:
 install-deps:
 ifeq ($(OS), ubuntu)
 	$(PKG_INSTALL) python3-pip
-	pip3 install --upgrade pip salt
+	pip3 install salt
 else
 ifeq ($(OS), debian)
 	$(PKG_INSTALL) python3-pip
-	pip3 install --upgrade pip salt
+	pip3 install salt
 endif
 endif
 	$(PKG_INSTALL) python3-setuptools python3-click
